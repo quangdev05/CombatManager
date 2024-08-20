@@ -1,0 +1,13 @@
+name: CombatManager
+version: '1.0.0-SNAPSHOT'
+main: tencer.quangdev05.combatManager.CombatManager
+api-version: '1.20'
+load: STARTUP
+authors: [ QuangDev05 ]
+description: Kiểm soát người chơi PVP.
+website: https://github.com/quangdev05
+commands:
+  combat:
+    usage: /combat reload
+    permission: combat.reload
+    permission-message: Bạn không có quyền sử dụng lệnh này.

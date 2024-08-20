@@ -1,0 +1,6 @@
+combat-duration: 5  # Thời gian combat tính bằng giây
+blocked-commands: # Chặn xử dụng lệnh.
+  - home
+  - spawn
+  - tpa
+  - tpaccept
