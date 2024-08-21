@@ -10,8 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,6 +21,7 @@ public class CombatManager extends JavaPlugin implements Listener {
 
     private Map<UUID, Long> combatPlayers = new HashMap<>();
     private long combatDuration;
+    private List<String> quitCommands;
 
     @Override
     public void onEnable() {
@@ -86,6 +89,20 @@ public class CombatManager extends JavaPlugin implements Listener {
                     }
                 }
             }.runTaskTimer(this, 20L, 20L); // Lặp lại mỗi giây
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (combatPlayers.containsKey(player.getUniqueId())) {
+            // Thực thi các lệnh khi người chơi thoát trong trạng thái combat
+            for (String command : quitCommands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
+            }
+
+            // Loại bỏ người chơi khỏi trạng thái combat
+            combatPlayers.remove(player.getUniqueId());
         }
     }
 

@@ -4,3 +4,6 @@ blocked-commands: # Chặn xử dụng lệnh.
   - spawn
   - tpa
   - tpaccept
+quit-commands:
+  - kick %player% Bạn đã thoát game khi đang trong trạng thái combat!
+  - say %player% đã bị xử lý vì thoát game khi đang trong combat!
