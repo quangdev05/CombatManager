@@ -1,9 +1,12 @@
-combat-duration: 5  # Thời gian combat tính bằng giây
-blocked-commands: # Chặn xử dụng lệnh.
+combat-duration: 5  # Thời gian combat tính bằng giây.
+blocked-commands: # Chặn lệnh khi vào chế độ Combat.
   - home
   - spawn
   - tpa
   - tpaccept
-quit-commands:
+quit-commands: # Khi đang trong chế độ Combat mà out, lệnh trừng phạt sẽ được thực thi.
   - kick %player% Bạn đã thoát game khi đang trong trạng thái combat!
   - say %player% đã bị xử lý vì thoát game khi đang trong combat!
+blacklisted-worlds: # Danh sách đen World, khi đưa một world vào chế độ combat trong world đó sẽ không hoạt động.
+  - spawn
+  - spawn2
