@@ -60,66 +60,67 @@ public class CombatManager extends JavaPlugin implements Listener {
         blacklistedWorlds = config.getStringList("blacklisted-worlds");
     }
 
-    @EventHandler
-    public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-            Player damaged = (Player) event.getEntity();
-            Player damager = (Player) event.getDamager();
+    private void createBossBar(Player player) {
+    BossBar bossBar = Bukkit.createBossBar("Bạn đang trong trạng thái combat!", BarColor.RED, BarStyle.SOLID);
+    bossBar.addPlayer(player);
+    playerBossBars.put(player.getUniqueId(), bossBar);
+}
 
-            if (blacklistedWorlds.contains(damaged.getWorld().getName())
-                    || blacklistedWorlds.contains(damager.getWorld().getName())) {
-                return;
-            }
+private void updateBossBar(Player player, double progress) {
+    BossBar bossBar = playerBossBars.get(player.getUniqueId());
+    if (bossBar != null) {
+        bossBar.setProgress(progress);
+    }
+}
 
-            combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
-            combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
+private void removeBossBar(Player player) {
+    BossBar bossBar = playerBossBars.get(player.getUniqueId());
+    if (bossBar != null) {
+        bossBar.removeAll();
+        playerBossBars.remove(player.getUniqueId());
+    }
+}
 
-            createAndUpdateBossBar(damaged);
-            createAndUpdateBossBar(damager);
+@EventHandler
+public void onPlayerDamage(EntityDamageByEntityEvent event) {
+    if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+        Player damaged = (Player) event.getEntity();
+        Player damager = (Player) event.getDamager();
 
-            new BukkitRunnable() {
-                long startTime = System.currentTimeMillis();
+        if (blacklistedWorlds.contains(damaged.getWorld().getName())
+                || blacklistedWorlds.contains(damager.getWorld().getName())) {
+            return;
+        }
 
-                @Override
-                public void run() {
-                    long elapsedTime = System.currentTimeMillis() - startTime;
-                    double timeLeft = combatDuration - elapsedTime;
-                    double progress = timeLeft / (double) combatDuration;
+        combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
+        combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
 
-                    if (progress <= 0) {
-                        combatPlayers.remove(damaged.getUniqueId());
-                        combatPlayers.remove(damager.getUniqueId());
-                        removeBossBar(damaged);
-                        removeBossBar(damager);
-                        this.cancel();
-                    } else {
-                        updateBossBar(damaged, progress);
-                        updateBossBar(damager, progress);
-                    }
+        createBossBar(damaged);
+        createBossBar(damager);
+
+        new BukkitRunnable() {
+            long startTime = System.currentTimeMillis();
+
+            @Override
+            public void run() {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                double timeLeft = combatDuration - elapsedTime;
+                double progress = timeLeft / (double) combatDuration;
+
+                if (progress <= 0) {
+                    combatPlayers.remove(damaged.getUniqueId());
+                    combatPlayers.remove(damager.getUniqueId());
+                    removeBossBar(damaged);
+                    removeBossBar(damager);
+                    this.cancel();
+                } else {
+                    updateBossBar(damaged, progress);
+                    updateBossBar(damager, progress);
                 }
-            }.runTaskTimer(this, 0L, 20L); // Lặp lại mỗi giây
-        }
+            }
+        }.runTaskTimer(this, 0L, 20L); // Lặp lại mỗi giây
     }
-
-    private void createAndUpdateBossBar(Player player) {
-        BossBar bossBar = Bukkit.createBossBar("Bạn đang trong trạng thái combat!", BarColor.RED, BarStyle.SOLID);
-        bossBar.addPlayer(player);
-        playerBossBars.put(player.getUniqueId(), bossBar);
-    }
-
-    private void updateBossBar(Player player, double progress) {
-        BossBar bossBar = playerBossBars.get(player.getUniqueId());
-        if (bossBar != null) {
-            bossBar.setProgress(progress);
-        }
-    }
-
-    private void removeBossBar(Player player) {
-        BossBar bossBar = playerBossBars.remove(player.getUniqueId());
-        if (bossBar != null) {
-            bossBar.removeAll();
-        }
-    }
+}
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
