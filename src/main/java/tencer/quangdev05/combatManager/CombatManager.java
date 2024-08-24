@@ -92,11 +92,17 @@ public void onPlayerDamage(EntityDamageByEntityEvent event) {
             return;
         }
 
+        // Update or create combat status
         combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
         combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
 
-        createBossBar(damaged);
-        createBossBar(damager);
+        // Check if boss bars need to be created
+        if (!playerBossBars.containsKey(damaged.getUniqueId())) {
+            createBossBar(damaged);
+        }
+        if (!playerBossBars.containsKey(damager.getUniqueId())) {
+            createBossBar(damager);
+        }
 
         new BukkitRunnable() {
             long startTime = System.currentTimeMillis();
@@ -118,7 +124,7 @@ public void onPlayerDamage(EntityDamageByEntityEvent event) {
                     updateBossBar(damager, progress);
                 }
             }
-        }.runTaskTimer(this, 0L, 20L); // Lặp lại mỗi giây
+        }.runTaskTimer(this, 0L, 20L); // Runs every second
     }
 }
 
