@@ -92,17 +92,26 @@ public void onPlayerDamage(EntityDamageByEntityEvent event) {
             return;
         }
 
-        // Cập nhật hoặc tạo trạng thái combat
+        // Đặt lại thời gian combat
         combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
         combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
 
-        // Tạo BossBar chỉ nếu chưa tồn tại
+        // Tạo BossBar hoặc reset lại tiến trình BossBar nếu đã tồn tại
         if (!playerBossBars.containsKey(damaged.getUniqueId())) {
             createBossBar(damaged);
+        } else {
+            updateBossBar(damaged, 1.0);  // Reset lại tiến trình về 1.0 (100%)
         }
+
         if (!playerBossBars.containsKey(damager.getUniqueId())) {
             createBossBar(damager);
+        } else {
+            updateBossBar(damager, 1.0);  // Reset lại tiến trình về 1.0 (100%)
         }
+
+        // Hủy bỏ mọi công việc cũ cho người chơi này nếu có
+        playerBossBars.get(damaged.getUniqueId()).getPlayers().clear();
+        playerBossBars.get(damager.getUniqueId()).getPlayers().clear();
 
         new BukkitRunnable() {
             long startTime = System.currentTimeMillis();
