@@ -92,11 +92,11 @@ public void onPlayerDamage(EntityDamageByEntityEvent event) {
             return;
         }
 
-        // Update or create combat status
+        // Cập nhật hoặc tạo trạng thái combat
         combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
         combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
 
-        // Check if boss bars need to be created
+        // Tạo BossBar chỉ nếu chưa tồn tại
         if (!playerBossBars.containsKey(damaged.getUniqueId())) {
             createBossBar(damaged);
         }
@@ -124,7 +124,7 @@ public void onPlayerDamage(EntityDamageByEntityEvent event) {
                     updateBossBar(damager, progress);
                 }
             }
-        }.runTaskTimer(this, 0L, 20L); // Runs every second
+        }.runTaskTimer(this, 0L, 20L); // Chạy mỗi giây
     }
 }
 
