@@ -61,17 +61,18 @@ public class CombatManager extends JavaPlugin implements Listener {
     }
 
     private void createBossBar(Player player) {
-    BossBar bossBar = Bukkit.createBossBar("Bạn đang trong trạng thái combat!", BarColor.RED, BarStyle.SOLID);
-    bossBar.addPlayer(player);
-    playerBossBars.put(player.getUniqueId(), bossBar);
-}
-
-private void updateBossBar(Player player, double progress) {
-    BossBar bossBar = playerBossBars.get(player.getUniqueId());
-    if (bossBar != null) {
-        bossBar.setProgress(progress);
+        BossBar bossBar = Bukkit.createBossBar("Bạn đang trong trạng thái combat!", BarColor.RED, BarStyle.SOLID);
+        bossBar.addPlayer(player); // Đảm bảo người chơi được thêm vào BossBar
+        playerBossBars.put(player.getUniqueId(), bossBar);
     }
-}
+
+    // Không loại bỏ tất cả người chơi khỏi BossBar khi chỉ cập nhật tiến trình.
+    private void updateBossBar(Player player, double progress) {
+        BossBar bossBar = playerBossBars.get(player.getUniqueId());
+        if (bossBar != null) {
+            bossBar.setProgress(progress);
+        }
+    }
 
 private void removeBossBar(Player player) {
     BossBar bossBar = playerBossBars.get(player.getUniqueId());
