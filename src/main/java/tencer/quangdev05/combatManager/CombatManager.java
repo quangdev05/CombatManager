@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.boss.BarColor;
@@ -86,24 +87,19 @@ public class CombatManager extends JavaPlugin implements Listener {
     }
 
     private void handleCombat(Player damaged, Player damager) {
-        // Kiểm tra nếu người chơi ở trong thế giới bị cấm
         if (blacklistedWorlds.contains(damaged.getWorld().getName()) || blacklistedWorlds.contains(damager.getWorld().getName())) {
             return;
         }
 
-        // Đặt lại thời gian combat
         combatPlayers.put(damaged.getUniqueId(), System.currentTimeMillis());
         combatPlayers.put(damager.getUniqueId(), System.currentTimeMillis());
 
-        // Tạo hoặc cập nhật BossBar cho người chơi bị sát thương
         BossBar damagedBossBar = playerBossBars.computeIfAbsent(damaged.getUniqueId(), uuid -> createBossBar(damaged));
         updateBossBar(damaged, 1.0);
 
-        // Tạo hoặc cập nhật BossBar cho người chơi gây sát thương
         BossBar damagerBossBar = playerBossBars.computeIfAbsent(damager.getUniqueId(), uuid -> createBossBar(damager));
         updateBossBar(damager, 1.0);
 
-        // Đặt thời gian để cập nhật BossBar
         new BukkitRunnable() {
             long startTime = System.currentTimeMillis();
 
@@ -124,7 +120,7 @@ public class CombatManager extends JavaPlugin implements Listener {
                     updateBossBar(damager, progress);
                 }
             }
-        }.runTaskTimer(this, 0L, 20L); // Chạy mỗi giây
+        }.runTaskTimer(this, 0L, 20L); 
     }
 
     @EventHandler
@@ -143,6 +139,15 @@ public class CombatManager extends JavaPlugin implements Listener {
             for (String command : quitCommands) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName()));
             }
+            removeBossBar(player);
+            combatPlayers.remove(player.getUniqueId());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (combatPlayers.containsKey(player.getUniqueId())) {
             removeBossBar(player);
             combatPlayers.remove(player.getUniqueId());
         }
