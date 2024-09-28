@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="CombatManager:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/CombatManager_jar</output-path>
-    <root id="archive" name="CombatManager.jar">
-      <element id="module-output" name="CombatManager" />
-    </root>
-  </artifact>
-</component>
